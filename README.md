@@ -1,4 +1,4 @@
-# Project Name
+# Splitter (??? we NEED a better name)
 ## Team Information
 ### Team Members
 - Anahita Pathak
