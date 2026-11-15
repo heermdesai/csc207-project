@@ -14,20 +14,72 @@
 ### User Story 1
 ### User Story 2
 ### User Story 3
-(Add additional user stories as needed.)
+As a group member, I want to record payment information, and edit or delete an expense if I made a mistake, so that I can keep track of my expenses. 
+### User Story 4
+As a group member, I want to see a summary of who owes whom, and get a suggestion for the fewest payments that clear all debts, so I can pay people back and record that payment once it is made.
+
 ---
 ## Use Cases
-### Use Case 1
-### Use Case 2
-### Use Case 3
-(Add additional use cases as needed.)
+### Story 3
+### Use Case 1: Add Expense (MVP)
+#### Main Success Scenario:
++ User opens a group and chooses "Add Expense". 
++ User enters an amount and description, selects who paid, and selects which members were involved. 
++ System validates the input and splits the amount equally among the involved members. 
++ System saves the expense to the group and shows it in the expense list.
+
+#### Alternate Scenarios:
++ Amount is empty, zero, negative or not a number: show an error, nothing saved. 
++ No payer or no participants selected: show an error, nothing saved. 
++ Payer or participant is not a member of the group: reject the expense.
+
+### Use Case 2: Edit Expense
+#### Main Success Scenario:
++ User selects an existing expense and chooses "Edit". 
++ User changes the amount, description, payer or participants. 
++ System validates the new values, saves the changes, and the group's balances update automatically.
+
+#### Alternate Scenarios:
++ Invalid input shows an error and the original expense is unchanged. Expense no longer exists: show an error.
+
+### Use Case 3: Delete Expense
+#### Main Success Scenario:
++ User selects an expense and chooses "Delete".
++ System asks for confirmation.
++ System removes the expense and the group's balances update automatically.
+
+#### Alternate Scenarios:
++ User cancels at the confirmation step and nothing changes.
+
+### Story 4
+### Use Case 1: View Balances (MVP)
+#### Main Success Scenario:
++ User opens a group and chooses "Balances". 
++ System calculates each member's net balance from all expenses and recorded settlements. 
++ System displays a summary of who owes whom and how much.
+
+#### Alternate Scenarios:
++ Group has no expenses, display "All settled up".
+
+### Use Case 2: Settle Up (MVP)
+#### Main Success Scenario:
++ User chooses "Settle Up" in a group. 
++ System computes the fewest payments needed to clear all debts and displays them. 
++ After a payment is made in real life, user marks that suggested payment as paid. 
++ System records the payment once and updates the balances.
+
+#### Alternate Scenarios:
++ No outstanding debts, display "Nothing to settle".
++ Payment already recorded, then it is not recorded a second time.
+
 ---
 ## Minimal Viable Product (MVP)
 | Team Member | MVP Use Case |
 |-------------|--------------|
 | Name | Use Case |
 | Name | Use Case |
-| Name | Use Case |
+| Saanvi Tyagi | Add Expense |
+| Heer Desai | View Balances, Settle Up |
 ---
 ## Entities
 ### Entity 1
@@ -35,9 +87,12 @@
 (Add additional entities as needed.)
 ---
 ## API Usage
-**API Name:**
-**Documentation:** [Link]
-**How it is used in the program:**
+**API Name: Frankfurter**
+
+**Documentation: frankfuter.dev** [https://frankfurter.dev/]
+
+**How it is used in the program: TODO**
+
 ---
 ## Design Diagrams
 ### UML Class Diagram
