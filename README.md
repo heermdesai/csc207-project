@@ -26,6 +26,62 @@ As a group member, I want to see a summary of who owes whom, and get a suggestio
 
 ---
 ## Use Cases
+### Story 1
+### Use Case 1: Sign Up (MVP)
+#### Main Success Scenario:
++ User opens the app and chooses "Sign Up".
++ User enters a username, a password, and confirms the password.
++ System validates the input, checks the username is not already taken, and saves the new account.
++ System logs the user in and shows their home screen.
+
+#### Alternate Scenarios:
++ A field is empty or the passwords don't match: show an error, nothing saved.
++ Username is already taken: show an error, nothing saved.
+
+### Use Case 2: Log In (MVP)
+#### Main Success Scenario:
++ User enters their username and password and chooses "Log In".
++ System checks the credentials against saved accounts.
++ System loads the user's groups and shows their home screen.
+
+#### Alternate Scenarios:
++ Username doesn't exist or password is wrong: show "Incorrect username or password".
++ A field is empty: show an error.
+
+### Use Case 3: Log Out
+#### Main Success Scenario:
++ User chooses "Log Out".
++ System ends the session and returns to the login screen.
+
+### Story 2
+### Use Case 1: Create Group (MVP)
+#### Main Success Scenario:
++ Logged-in user chooses "Create Group" and enters a group name.
++ System validates the name, creates the group with the user as its first member, and generates a unique join code.
++ System saves the group and shows the group page with its join code.
+
+#### Alternate Scenarios:
++ Group name is empty: show an error, nothing saved.
++ Generated code is already in use: system generates a new one.
+
+### Use Case 2: Join Group (MVP)
+#### Main Success Scenario:
++ User chooses "Join Group" and enters a join code.
++ System finds the group with that code and adds the user as a member.
++ System saves the change and shows the group page.
+
+#### Alternate Scenarios:
++ Code doesn't match any group: show "Invalid join code".
++ User is already a member: open the group without adding them twice.
+
+### Use Case 3: View Members (MVP)
+#### Main Success Scenario:
++ User opens a group they belong to.
++ System displays the group name, its join code, and a list of all members.
+
+#### Alternate Scenarios:
++ User is the only member: show the list with just them and remind them to share the join code.
+
 ### Story 3
 ### Use Case 1: Add Expense (MVP)
 #### Main Success Scenario:
