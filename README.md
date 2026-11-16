@@ -8,7 +8,11 @@
 ---
 ## Project Description
 ### Domain
-[Project description]
+Personal finance: shared expense tracking and splitting.
+
+### Description
+Splitter is a Java Swing desktop app that helps groups of people (roommates, friends on a trip, club members) keep track of shared expenses and work out who owes whom. Users create a group, log expenses as they happen, and the app splits each cost among the members involved. It keeps a running balance for every member and suggests the fewest payments needed to settle all debts. As an implemented extension, expenses can be entered in different currencies and converted using the Frankfurter exchange-rate API, and group data is saved so it's still there the next time the app is opened.
+
 ---
 ## User Stories
 ### User Story 1
