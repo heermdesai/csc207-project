@@ -16,7 +16,9 @@ Splitter is a Java Swing desktop app that helps groups of people (roommates, fri
 ---
 ## User Stories
 ### User Story 1
+As a new user, I want to sign up and log in with my own account, so that my groups and expenses are saved and only visible to me.
 ### User Story 2
+As a user, I want to create a group, share a join code so my friends can join, and see everyone in the group, so that we can track shared expenses together.
 ### User Story 3
 As a group member, I want to record payment information, and edit or delete an expense if I made a mistake, so that I can keep track of my expenses. 
 ### User Story 4
