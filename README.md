@@ -138,8 +138,8 @@ As a group member, I want to see a summary of who owes whom, and get a suggestio
 ## Minimal Viable Product (MVP)
 | Team Member | MVP Use Case |
 |-------------|--------------|
-| Name | Use Case |
-| Name | Use Case |
+| Saksham Garg | Sign Up, Log In |
+| Anahita Pathak | Create Group, Join Group, View Members |
 | Saanvi Tyagi | Add Expense |
 | Heer Desai | View Balances, Settle Up |
 ---
