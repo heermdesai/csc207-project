@@ -16,11 +16,11 @@ Splitter is a Java Swing desktop app that helps groups of people (roommates, fri
 ---
 ## User Stories
 ### User Story 1
-As a new user, I want to sign up and log in with my own account, so that my groups and expenses are saved and only visible to me.
+As a new user, I want to sign up and log in with my own account, so that my groups and expenses are saved and only visible to me and the members of my group.
 ### User Story 2
 As a user, I want to create a group, share a join code so my friends can join, and see everyone in the group, so that we can track shared expenses together.
 ### User Story 3
-As a group member, I want to record payment information, and edit or delete an expense if I made a mistake, so that I can keep track of my expenses. 
+As a group member, I want to record payment information, and edit or delete an expense if I made a mistake, so that I can accurately keep track of my expenses.
 ### User Story 4
 As a group member, I want to see a summary of who owes whom, and get a suggestion for the fewest payments that clear all debts, so I can pay people back and record that payment once it is made.
 
@@ -113,6 +113,18 @@ As a group member, I want to see a summary of who owes whom, and get a suggestio
 #### Alternate Scenarios:
 + User cancels at the confirmation step and nothing changes.
 
+### Use Case 4: Add Expense in a Foreign Currency (Extension)
+#### Main Success Scenario:
++ In "Add Expense", the user picks a currency that differs from the group's base currency (e.g., EUR in a CAD group). 
++ System requests the exchange rate for the expense's date from the Frankfurter API. 
++ System converts the amount to the group's base currency and stores the original amount, original currency, rate used, and converted amount with the expense. 
++ System splits the converted amount among the involved members and shows the expense with both amounts.
+
+#### Alternate Scenarios:
++ API is unreachable or returns an error, then show a clear message and do not save the expense. 
++ Currency is not supported by the API, then show an error, nothing saved.  
++ Currency equals the group's base currency, then skip the API call and use a rate of 1.
+
 ### Story 4
 ### Use Case 1: View Balances (MVP)
 #### Main Success Scenario:
@@ -144,9 +156,37 @@ As a group member, I want to see a summary of who owes whom, and get a suggestio
 | Heer Desai | View Balances, Settle Up |
 ---
 ## Entities
-### Entity 1
-### Entity 2
-(Add additional entities as needed.)
+### User
++ username (unique)
++ password
+
+### Group
++ id
++ name
++ joinCode (unique)
++ baseCurrency
++ members
++ expenses
++ settlements
+
+### Expense
++ id 
++ description 
++ payer 
++ participants 
++ originalAmount
++ originalCurrency 
++ exchangeRate (1 if no conversion)
++ amount 
++ date
+
+### Settlement
++ id 
++ from 
++ to 
++ amount 
++ date
+
 ---
 ## API Usage
 **API Name: Frankfurter**
