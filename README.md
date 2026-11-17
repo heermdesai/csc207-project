@@ -156,36 +156,43 @@ As a group member, I want to see a summary of who owes whom, and get a suggestio
 | Heer Desai | View Balances, Settle Up |
 ---
 ## Entities
-### User
+### Entity 1: Money (value object)
+
+An immutable amount of money in one currency.
++ amount and currency 
++ Rounds to the currency's minor unit (2 decimals for CAD)
++ add, subtract, and convert(rate, targetCurrency)
++ Rejects mixing currencies in add and subtract
+
+### Entity 2: User
+
+A person with an account.
 + username (unique)
 + password
 
-### Group
-+ id
-+ name
-+ joinCode (unique)
-+ baseCurrency
-+ members
-+ expenses
-+ settlements
+### Entity 3: Group
 
-### Expense
-+ id 
-+ description 
-+ payer 
-+ participants 
-+ originalAmount
+An aggregate that holds the members, expenses, and settlements of one group.
++ id, name, joinCode (unique), baseCurrency 
++ members, expenses, settlements 
++ No duplicate members, and an expense's payer and participants must all be members 
++ Methods: addMember, isMember, addExpense, replaceExpense, removeExpense, addSettlement 
+
+### Entity 4: Expense
+
+One shared cost that is immutable.
++ id, description, payer, participants, date
 + originalCurrency 
 + exchangeRate (1 if no conversion)
-+ amount 
-+ date
++ amount
++ Positive amount, at least one participant
++ getShares() returns what each participant owes
 
-### Settlement
-+ id 
-+ from 
-+ to 
-+ amount 
-+ date
+### Entity 5: Settlement
+
+A recorded payment from one member to another.
++ id, from, to, amount, date
++ Positive amount, and from must differ from to
 
 ---
 ## API Usage
@@ -193,15 +200,168 @@ As a group member, I want to see a summary of who owes whom, and get a suggestio
 
 **Documentation: frankfuter.dev** [https://frankfurter.dev/]
 
-**How it is used in the program: TODO**
+**How it is used in the program:**
+Frankfurter is a free exchange-rate API that needs no API key. It is used by the Add Expense in a Foreign Currency use case, and again when an edited expense changes its amount, currency, or date.
 
 ---
 ## Design Diagrams
 ### UML Class Diagram
-### Sequence Diagrams
+```mermaid
+classDiagram
+    class Money {
+        -BigDecimal amount
+        -Currency currency
+        +add(Money) Money
+        +subtract(Money) Money
+        +convert(BigDecimal, Currency) Money
+    }
+    class User {
+        -String username
+        -String password
+    }
+    class Group {
+        -String id
+        -String name
+        -String joinCode
+        -Currency baseCurrency
+        -List~User~ members
+        -List~Expense~ expenses
+        -List~Settlement~ settlements
+        +addMember(User)
+        +isMember(User) boolean
+        +addExpense(Expense)
+        +replaceExpense(Expense)
+        +removeExpense(String)
+        +addSettlement(Settlement)
+    }
+    class Expense {
+        -String id
+        -String description
+        -User payer
+        -List~User~ participants
+        -Money original
+        -BigDecimal exchangeRate
+        -Money amount
+        -LocalDate date
+        +getShares() Map
+    }
+    class Settlement {
+        -String id
+        -User from
+        -User to
+        -Money amount
+        -LocalDate date
+    }
+    class SplitStrategy {
+        <<interface>>
+        +split(Money, List~User~) Map
+    }
+    class EqualSplitStrategy
+    class BalanceCalculator {
+        +calculate(Group) Map
+    }
+
+    Group "1" o-- "*" User : members
+    Group "1" *-- "*" Expense
+    Group "1" *-- "*" Settlement
+    Expense --> User : payer, participants
+    Expense --> Money
+    Expense --> SplitStrategy
+    Settlement --> Money
+    SplitStrategy <|.. EqualSplitStrategy
+    BalanceCalculator ..> Group
+
+```
+
+## Sequence Diagrams
+
+### Add Expense in foreign currency:
+```mermaid 
+
+sequenceDiagram
+    actor User
+    participant View as AddExpenseView
+    participant Ctrl as AddExpenseController
+    participant UC as AddExpenseInteractor
+    participant DAO as AddExpenseDataAccessInterface
+    participant Conv as CurrencyConversionService
+    participant FX as ExchangeRateGateway (Frankfurter)
+    participant Pres as AddExpensePresenter
+
+    User->>View: enter amount, currency, payer, participants
+    View->>Ctrl: submit
+    Ctrl->>UC: execute(inputData)
+    UC->>DAO: getGroup(groupId)
+    DAO-->>UC: Group
+    UC->>UC: check input (empty, not a number)
+    alt currency differs from base currency
+        UC->>Conv: convert(money, baseCurrency, date)
+        Conv->>FX: getRate(from, to, date)
+        FX-->>Conv: rate
+        Conv-->>UC: rate and converted Money
+    end
+    UC->>UC: create Expense (entity checks amount and participants)
+    UC->>UC: group.addExpense (entity checks membership)
+    UC->>DAO: save(group)
+    UC->>Pres: prepareSuccessView(outputData)
+    Pres-->>View: update view model, refresh expense list
+
+```
+
+### Settle Up:
+```mermaid
+
+sequenceDiagram
+    actor User
+    participant View as SettleUpView
+    participant C1 as SuggestTransfersController
+    participant UC1 as SuggestTransfersInteractor
+    participant C2 as RecordSettlementController
+    participant UC2 as RecordSettlementInteractor
+    participant DAO as DataAccessInterface
+    participant Calc as BalanceCalculator
+    participant Sug as TransferSuggester
+    participant Pres as Presenter
+
+    User->>View: open Settle Up
+    View->>C1: load suggestions
+    C1->>UC1: execute(groupId)
+    UC1->>DAO: getGroup(groupId)
+    DAO-->>UC1: Group
+    UC1->>Calc: calculate(group)
+    Calc-->>UC1: net balances
+    UC1->>Sug: suggest(balances)
+    Sug-->>UC1: transfers
+    UC1->>Pres: prepareSuccessView(transfers)
+    Pres-->>View: show suggested payments
+
+    User->>View: mark a payment as paid
+    View->>C2: markPaid(transfer)
+    C2->>UC2: execute(groupId, transfer)
+    UC2->>DAO: getGroup(groupId)
+    DAO-->>UC2: Group
+    UC2->>Sug: suggest(current balances)
+    alt transfer is still among the suggestions
+        UC2->>UC2: create Settlement, group.addSettlement
+        UC2->>DAO: save(group)
+        UC2->>Pres: prepareSuccessView(updated transfers)
+    else already recorded
+        UC2->>Pres: prepareFailView(already recorded)
+    end
+
+```
+
+
 ---
 ## How to Run
 [Instructions for running the program.]
+1. Clone the repository.
+2. Build the project and run tests.
+3. Run the app by launching the Main class (app.Main) from your IDE, or from the command line.
+4. Sign up for an account, create a group, and share its join code. To try joining, log out, sign up as a second user, and enter the code.
+
+Data is saved to local JSON files in the data/folder, which is created on first run. Delete this folder to reset the app.
+
 ---
 ## Notes
 [Any additional project information.]
