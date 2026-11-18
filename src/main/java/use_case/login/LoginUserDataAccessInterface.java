@@ -27,4 +27,10 @@ public interface LoginUserDataAccessInterface {
      */
     User get(String username);
 
+    /**
+     * Records which user is currently logged in.
+     * @param username the username of the logged-in user, or null if nobody is logged in
+     */
+    void setCurrentUsername(String username);
+
 }

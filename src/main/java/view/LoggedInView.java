@@ -3,6 +3,7 @@ package view;
 import interface_adapter.logged_in.ChangePasswordController;
 import interface_adapter.logged_in.LoggedInState;
 import interface_adapter.logged_in.LoggedInViewModel;
+import interface_adapter.logout.LogoutController;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -22,6 +23,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final LoggedInViewModel loggedInViewModel;
     private final JLabel passwordErrorField = new JLabel();
     private ChangePasswordController changePasswordController = null;
+    private LogoutController logoutController = null;
 
     private final JLabel username;
 
@@ -50,7 +52,13 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         changePassword = new JButton("Change Password");
         buttons.add(changePassword);
 
-        logOut.addActionListener(this);
+        logOut.addActionListener(
+                evt -> {
+                    if (evt.getSource().equals(logOut)) {
+                        logoutController.execute();
+                    }
+                }
+        );
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -114,6 +122,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         if (evt.getPropertyName().equals("state")) {
             final LoggedInState state = (LoggedInState) evt.getNewValue();
             username.setText(state.getUsername());
+            passwordInputField.setText(state.getPassword());
         }
         else if (evt.getPropertyName().equals("password")) {
             final LoggedInState state = (LoggedInState) evt.getNewValue();
@@ -128,5 +137,9 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
 
     public void setChangePasswordController(ChangePasswordController changePasswordController) {
         this.changePasswordController = changePasswordController;
+    }
+
+    public void setLogoutController(LogoutController logoutController) {
+        this.logoutController = logoutController;
     }
 }
