@@ -38,7 +38,7 @@ public class DBUserDataAccessObject implements SignupUserDataAccessInterface,
         // Make an API call to get the user object.
         final OkHttpClient client = new OkHttpClient().newBuilder().build();
         final Request request = new Request.Builder()
-                .url(String.format("http://vm003.teach.cs.toronto.edu:20112/user?email=%s", email))
+                .url(String.format("http://vm003.teach.cs.toronto.edu:20112/user?%s=%s", SERVER_ID_KEY, email))
                 .addHeader("Content-Type", CONTENT_TYPE_JSON)
                 .build();
         try {
