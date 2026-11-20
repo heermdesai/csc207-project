@@ -23,7 +23,7 @@ public class DBUserDataAccessObject implements SignupUserDataAccessInterface,
     private static final String CONTENT_TYPE_LABEL = "Content-Type";
     private static final String CONTENT_TYPE_JSON = "application/json";
     private static final String STATUS_CODE_LABEL = "status_code";
-    private static final String USERNAME = "username";
+    private static final String SERVER_ID_KEY = "username";
     private static final String PASSWORD = "password";
     private static final String MESSAGE = "message";
     private final UserFactory userFactory;
@@ -34,11 +34,11 @@ public class DBUserDataAccessObject implements SignupUserDataAccessInterface,
     }
 
     @Override
-    public User get(String username) {
+    public User get(String email) {
         // Make an API call to get the user object.
         final OkHttpClient client = new OkHttpClient().newBuilder().build();
         final Request request = new Request.Builder()
-                .url(String.format("http://vm003.teach.cs.toronto.edu:20112/user?username=%s", username))
+                .url(String.format("http://vm003.teach.cs.toronto.edu:20112/user?%s=%s", SERVER_ID_KEY, email))
                 .addHeader("Content-Type", CONTENT_TYPE_JSON)
                 .build();
         try {
@@ -48,7 +48,7 @@ public class DBUserDataAccessObject implements SignupUserDataAccessInterface,
 
             if (responseBody.getInt(STATUS_CODE_LABEL) == SUCCESS_CODE) {
                 final JSONObject userJSONObject = responseBody.getJSONObject("user");
-                final String name = userJSONObject.getString(USERNAME);
+                final String name = userJSONObject.getString(SERVER_ID_KEY);
                 final String password = userJSONObject.getString(PASSWORD);
 
                 return userFactory.create(name, password);
@@ -63,11 +63,11 @@ public class DBUserDataAccessObject implements SignupUserDataAccessInterface,
     }
 
     @Override
-    public boolean existsByName(String username) {
+    public boolean existsByEmail(String email) {
         final OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         final Request request = new Request.Builder()
-                .url(String.format("http://vm003.teach.cs.toronto.edu:20112/checkIfUserExists?username=%s", username))
+                .url(String.format("http://vm003.teach.cs.toronto.edu:20112/checkIfUserExists?%s=%s", SERVER_ID_KEY, email))
                 .addHeader(CONTENT_TYPE_LABEL, CONTENT_TYPE_JSON)
                 .build();
         try {
@@ -91,7 +91,7 @@ public class DBUserDataAccessObject implements SignupUserDataAccessInterface,
         // POST METHOD
         final MediaType mediaType = MediaType.parse(CONTENT_TYPE_JSON);
         final JSONObject requestBody = new JSONObject();
-        requestBody.put(USERNAME, user.getName());
+        requestBody.put(SERVER_ID_KEY, user.getEmail());
         requestBody.put(PASSWORD, user.getPassword());
         final RequestBody body = RequestBody.create(requestBody.toString(), mediaType);
         final Request request = new Request.Builder()
@@ -124,7 +124,7 @@ public class DBUserDataAccessObject implements SignupUserDataAccessInterface,
         // POST METHOD
         final MediaType mediaType = MediaType.parse(CONTENT_TYPE_JSON);
         final JSONObject requestBody = new JSONObject();
-        requestBody.put(USERNAME, user.getName());
+        requestBody.put(SERVER_ID_KEY, user.getEmail());
         requestBody.put(PASSWORD, user.getPassword());
         final RequestBody body = RequestBody.create(requestBody.toString(), mediaType);
         final Request request = new Request.Builder()
@@ -149,15 +149,15 @@ public class DBUserDataAccessObject implements SignupUserDataAccessInterface,
         }
     }
 
-    private String currentUsername;
+    private String currentEmail;
 
     @Override
-    public String getCurrentUsername() {
-        return currentUsername;
+    public String getCurrentEmail() {
+        return currentEmail;
     }
 
     @Override
-    public void setCurrentUsername(String username) {
-        this.currentUsername = username;
+    public void setCurrentEmail(String email) {
+        this.currentEmail = email;
     }
 }

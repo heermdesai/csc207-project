@@ -2,10 +2,15 @@ package use_case.login;
 
 import entity.User;
 
+import java.util.Locale;
+
 /**
  * The Login Interactor.
  */
 public class LoginInteractor implements LoginInputBoundary {
+
+    static final String INCORRECT_CREDENTIALS = "Incorrect email or password.";
+
     private final LoginUserDataAccessInterface userDataAccessObject;
     private final LoginOutputBoundary loginPresenter;
 
@@ -17,24 +22,20 @@ public class LoginInteractor implements LoginInputBoundary {
 
     @Override
     public void execute(LoginInputData loginInputData) {
-        final String username = loginInputData.getUsername();
+        final String email = loginInputData.getEmail() == null
+                ? "" : loginInputData.getEmail().trim().toLowerCase(Locale.ROOT);
         final String password = loginInputData.getPassword();
-        if (!userDataAccessObject.existsByName(username)) {
-            loginPresenter.prepareFailView(username + ": Account does not exist.");
+        if (email.isEmpty() || password == null || password.isEmpty()) {
+            loginPresenter.prepareFailView("Please enter your email and password.");
+        }
+        else if (!userDataAccessObject.existsByEmail(email)
+                || !password.equals(userDataAccessObject.get(email).getPassword())) {
+            loginPresenter.prepareFailView(INCORRECT_CREDENTIALS);
         }
         else {
-            final String pwd = userDataAccessObject.get(username).getPassword();
-            if (!password.equals(pwd)) {
-                loginPresenter.prepareFailView("Incorrect password for \"" + username + "\".");
-            }
-            else {
-
-                final User user = userDataAccessObject.get(loginInputData.getUsername());
-                userDataAccessObject.setCurrentUsername(user.getName());
-
-                final LoginOutputData loginOutputData = new LoginOutputData(user.getName(), false);
-                loginPresenter.prepareSuccessView(loginOutputData);
-            }
+            final User user = userDataAccessObject.get(email);
+            userDataAccessObject.setCurrentEmail(user.getEmail());
+            loginPresenter.prepareSuccessView(new LoginOutputData(user.getEmail(), false));
         }
     }
 }

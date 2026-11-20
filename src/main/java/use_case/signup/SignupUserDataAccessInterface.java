@@ -8,11 +8,11 @@ import entity.User;
 public interface SignupUserDataAccessInterface {
 
     /**
-     * Checks if the given username exists.
-     * @param username the username to look for
-     * @return true if a user with the given username exists; false otherwise
+     * Checks if the given email exists.
+     * @param email the email to look for
+     * @return true if a user with the given email exists; false otherwise
      */
-    boolean existsByName(String username);
+    boolean existsByEmail(String email);
 
     /**
      * Saves the user.

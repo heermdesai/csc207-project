@@ -13,13 +13,13 @@ public class LogoutInteractor implements LogoutInputBoundary {
 
     @Override
     public void execute() {
-        final String username = userDataAccessObject.getCurrentUsername();
-        if (username == null) {
+        final String email = userDataAccessObject.getCurrentEmail();
+        if (email == null) {
             logoutPresenter.prepareFailView("No user is currently logged in.");
         }
         else {
-            userDataAccessObject.setCurrentUsername(null);
-            logoutPresenter.prepareSuccessView(new LogoutOutputData(username));
+            userDataAccessObject.setCurrentEmail(null);
+            logoutPresenter.prepareSuccessView(new LogoutOutputData(email));
         }
     }
 }

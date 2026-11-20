@@ -21,35 +21,35 @@ public class InMemoryUserDataAccessObject implements SignupUserDataAccessInterfa
     private final Map<String, User> users = new HashMap<>();
 
     @Override
-    public boolean existsByName(String identifier) {
+    public boolean existsByEmail(String identifier) {
         return users.containsKey(identifier);
     }
 
     @Override
     public void save(User user) {
-        users.put(user.getName(), user);
+        users.put(user.getEmail(), user);
     }
 
     @Override
-    public User get(String username) {
-        return users.get(username);
+    public User get(String email) {
+        return users.get(email);
     }
 
     @Override
     public void changePassword(User user) {
         // Replace the old entry with the new password
-        users.put(user.getName(), user);
+        users.put(user.getEmail(), user);
     }
 
-    private String currentUsername;
+    private String currentEmail;
 
     @Override
-    public String getCurrentUsername() {
-        return currentUsername;
+    public String getCurrentEmail() {
+        return currentEmail;
     }
 
     @Override
-    public void setCurrentUsername(String username) {
-        this.currentUsername = username;
+    public void setCurrentEmail(String email) {
+        this.currentEmail = email;
     }
 }
