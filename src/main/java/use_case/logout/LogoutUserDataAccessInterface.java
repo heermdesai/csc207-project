@@ -2,7 +2,7 @@ package use_case.logout;
 
 public interface LogoutUserDataAccessInterface {
 
-    String getCurrentUsername();
+    String getCurrentEmail();
 
-    void setCurrentUsername(String username);
+    void setCurrentEmail(String email);
 }

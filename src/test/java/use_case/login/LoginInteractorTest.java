@@ -10,33 +10,17 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 class LoginInteractorTest {
 
-    @Test
-    void successRecordsCurrentUser() {
-        final InMemoryUserDataAccessObject userRepository = new InMemoryUserDataAccessObject();
-        userRepository.save(new UserFactory().create("Paul", "password"));
+    private static final String EMAIL = "paul@mail.utoronto.ca";
 
-        final LoginOutputBoundary successPresenter = new LoginOutputBoundary() {
-            @Override
-            public void prepareSuccessView(LoginOutputData outputData) {
-                assertEquals("Paul", outputData.getUsername());
-                assertEquals("Paul", userRepository.getCurrentUsername());
-            }
-
-            @Override
-            public void prepareFailView(String error) {
-                fail("Use case failure is unexpected.");
-            }
-        };
-
-        new LoginInteractor(userRepository, successPresenter).execute(new LoginInputData("Paul", "password"));
+    private InMemoryUserDataAccessObject repositoryWithPaul() {
+        final InMemoryUserDataAccessObject repository = new InMemoryUserDataAccessObject();
+        repository.save(new UserFactory().create(EMAIL, "password123"));
+        return repository;
     }
 
-    @Test
-    void wrongPasswordDoesNotLogIn() {
-        final InMemoryUserDataAccessObject userRepository = new InMemoryUserDataAccessObject();
-        userRepository.save(new UserFactory().create("Paul", "password"));
-
-        final LoginOutputBoundary failurePresenter = new LoginOutputBoundary() {
+    private void expectFailure(String email, String password, String expectedMessage) {
+        final InMemoryUserDataAccessObject repository = repositoryWithPaul();
+        final LoginOutputBoundary presenter = new LoginOutputBoundary() {
             @Override
             public void prepareSuccessView(LoginOutputData outputData) {
                 fail("Use case success is unexpected.");
@@ -44,11 +28,43 @@ class LoginInteractorTest {
 
             @Override
             public void prepareFailView(String error) {
-                assertEquals("Incorrect password for \"Paul\".", error);
-                assertNull(userRepository.getCurrentUsername());
+                assertEquals(expectedMessage, error);
+                assertNull(repository.getCurrentEmail());
             }
         };
+        new LoginInteractor(repository, presenter).execute(new LoginInputData(email, password));
+    }
 
-        new LoginInteractor(userRepository, failurePresenter).execute(new LoginInputData("Paul", "wrong"));
+    @Test
+    void successRecordsCurrentUser() {
+        final InMemoryUserDataAccessObject repository = repositoryWithPaul();
+        final LoginOutputBoundary presenter = new LoginOutputBoundary() {
+            @Override
+            public void prepareSuccessView(LoginOutputData outputData) {
+                assertEquals(EMAIL, outputData.getEmail());
+                assertEquals(EMAIL, repository.getCurrentEmail());
+            }
+
+            @Override
+            public void prepareFailView(String error) {
+                fail("Use case failure is unexpected.");
+            }
+        };
+        new LoginInteractor(repository, presenter).execute(new LoginInputData(" Paul@Mail.UToronto.ca ", "password123"));
+    }
+
+    @Test
+    void wrongPasswordGivesGenericError() {
+        expectFailure(EMAIL, "wrongpass", LoginInteractor.INCORRECT_CREDENTIALS);
+    }
+
+    @Test
+    void unknownEmailGivesSameGenericError() {
+        expectFailure("nobody@mail.com", "password123", LoginInteractor.INCORRECT_CREDENTIALS);
+    }
+
+    @Test
+    void emptyFieldsAreRejected() {
+        expectFailure("", "", "Please enter your email and password.");
     }
 }

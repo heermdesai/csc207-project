@@ -2,13 +2,13 @@ package use_case.logout;
 
 public class LogoutOutputData {
 
-    private final String username;
+    private final String email;
 
-    public LogoutOutputData(String username) {
-        this.username = username;
+    public LogoutOutputData(String email) {
+        this.email = email;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 }

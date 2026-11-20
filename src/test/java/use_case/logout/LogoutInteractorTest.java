@@ -14,13 +14,13 @@ class LogoutInteractorTest {
     void successLogsOutCurrentUser() {
         final InMemoryUserDataAccessObject userRepository = new InMemoryUserDataAccessObject();
         userRepository.save(new UserFactory().create("Paul", "password"));
-        userRepository.setCurrentUsername("Paul");
+        userRepository.setCurrentEmail("Paul");
 
         final LogoutOutputBoundary successPresenter = new LogoutOutputBoundary() {
             @Override
             public void prepareSuccessView(LogoutOutputData outputData) {
-                assertEquals("Paul", outputData.getUsername());
-                assertNull(userRepository.getCurrentUsername());
+                assertEquals("Paul", outputData.getEmail());
+                assertNull(userRepository.getCurrentEmail());
             }
 
             @Override

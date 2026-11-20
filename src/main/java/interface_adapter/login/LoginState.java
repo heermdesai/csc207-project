@@ -4,12 +4,12 @@ package interface_adapter.login;
  * The state for the Login View Model.
  */
 public class LoginState {
-    private String username = "";
+    private String email = "";
     private String loginError;
     private String password = "";
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
     public String getLoginError() {
@@ -20,12 +20,12 @@ public class LoginState {
         return password;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public void setLoginError(String usernameError) {
-        this.loginError = usernameError;
+    public void setLoginError(String emailError) {
+        this.loginError = emailError;
     }
 
     public void setPassword(String password) {
