@@ -67,7 +67,7 @@ public class DBUserDataAccessObject implements SignupUserDataAccessInterface,
         final OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         final Request request = new Request.Builder()
-                .url(String.format("http://vm003.teach.cs.toronto.edu:20112/checkIfUserExists?email=%s", email))
+                .url(String.format("http://vm003.teach.cs.toronto.edu:20112/checkIfUserExists?%s=%s", SERVER_ID_KEY, email))
                 .addHeader(CONTENT_TYPE_LABEL, CONTENT_TYPE_JSON)
                 .build();
         try {
