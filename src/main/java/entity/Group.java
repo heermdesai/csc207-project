@@ -18,38 +18,46 @@ public class Group {
         this.name = name;
         this.joinCode = joinCode;
         this.baseCurrency = baseCurrency;
-        this.creatorEmail = creatorEmail;
+        this.creatorEmail = normalize(creatorEmail);
         this.memberEmails = new ArrayList<>();
-        this.memberEmails.add(creatorEmail);
+        this.memberEmails.add(this.creatorEmail);
     }
 
     public String getId() {
         return this.id;
     }
+
     public String getName() {
         return this.name;
     }
+
     public String getJoinCode() {
         return this.joinCode;
     }
+
     public String getBaseCurrency() {
         return this.baseCurrency;
     }
-    public List<String> getMemberEmails(){
-        List<String> memberlist = new ArrayList<>();
-        for (String each : this.memberEmails){
-            memberlist.add(each);
-        }
-        return memberlist;
+
+    public String getCreatorEmail() {
+        return this.creatorEmail;
+    }
+
+    public List<String> getMemberEmails() {
+        return new ArrayList<>(this.memberEmails);
     }
 
     public boolean isMember(String email) {
-        return this.getMemberEmails().contains(email);
+        return this.memberEmails.contains(normalize(email));
     }
+
     public void addMember(String email) {
         if (!isMember(email)) {
-            this.memberEmails.add(email);
+            this.memberEmails.add(normalize(email));
         }
+    }
 
+    private static String normalize(String email) {
+        return email.trim().toLowerCase();
     }
 }
