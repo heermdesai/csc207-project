@@ -216,7 +216,7 @@ classDiagram
         +convert(BigDecimal, Currency) Money
     }
     class User {
-        -String username
+        -String email
         -String password
     }
     class Group {
@@ -261,16 +261,15 @@ classDiagram
         +calculate(Group) Map
     }
 
-    Group "1" o-- "*" User : members
-    Group "1" *-- "*" Expense
-    Group "1" *-- "*" Settlement
-    Expense --> User : payer, participants
-    Expense --> Money
-    Expense --> SplitStrategy
-    Settlement --> Money
-    SplitStrategy <|.. EqualSplitStrategy
-    BalanceCalculator ..> Group
-
+Group "1" o-- "*" User : members
+Group "1" *-- "*" Expense
+Group "1" *-- "*" Settlement
+Expense --> User : payer, participants
+Expense --> Money
+Expense --> SplitStrategy
+Settlement --> Money
+SplitStrategy <|.. EqualSplitStrategy
+BalanceCalculator ..> Group
 ```
 
 ## Sequence Diagrams
