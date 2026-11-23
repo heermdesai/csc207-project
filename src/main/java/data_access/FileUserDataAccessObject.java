@@ -2,7 +2,6 @@ package data_access;
 
 import entity.User;
 import entity.UserFactory;
-import use_case.change_password.ChangePasswordUserDataAccessInterface;
 import use_case.login.LoginUserDataAccessInterface;
 import use_case.logout.LogoutUserDataAccessInterface;
 import use_case.signup.SignupUserDataAccessInterface;
@@ -17,7 +16,6 @@ import java.util.Map;
  */
 public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
                                                  LoginUserDataAccessInterface,
-                                                 ChangePasswordUserDataAccessInterface,
                                                  LogoutUserDataAccessInterface {
 
     private static final String HEADER = "email,password";
@@ -92,13 +90,6 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface,
     @Override
     public boolean existsByEmail(String identifier) {
         return accounts.containsKey(identifier);
-    }
-
-    @Override
-    public void changePassword(User user) {
-        // Replace the User object in the map
-        accounts.put(user.getEmail(), user);
-        save();
     }
 
     private String currentEmail;
