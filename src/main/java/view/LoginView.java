@@ -4,143 +4,80 @@ import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginState;
 import interface_adapter.login.LoginViewModel;
 
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.Box;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 /**
  * The View for when the user is logging into the program.
  */
-public class LoginView extends JPanel implements ActionListener, PropertyChangeListener {
+public class LoginView extends JPanel implements PropertyChangeListener {
 
     private final String viewName = "log in";
     private final LoginViewModel loginViewModel;
 
-    private final JTextField emailInputField = new JTextField(15);
-    private final JLabel emailErrorField = new JLabel();
-
-    private final JPasswordField passwordInputField = new JPasswordField(15);
-    private final JLabel passwordErrorField = new JLabel();
-
-    private final JButton logIn;
-    private final JButton cancel;
-    private LoginController loginController = null;
+    private final JTextField emailInputField = new JTextField();
+    private final JPasswordField passwordInputField = new JPasswordField();
+    private final JLabel errorLabel = AuthLayout.errorLabel();
+    private LoginController loginController;
 
     public LoginView(LoginViewModel loginViewModel) {
-
         this.loginViewModel = loginViewModel;
         this.loginViewModel.addPropertyChangeListener(this);
 
-        final JLabel title = new JLabel("Login Screen");
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        final PrimaryButton logIn = new PrimaryButton("Log in");
+        logIn.addActionListener(evt -> submit());
+        passwordInputField.addActionListener(evt -> submit());
 
-        final LabelTextPanel emailInfo = new LabelTextPanel(
-                new JLabel("Email"), emailInputField);
-        final LabelTextPanel passwordInfo = new LabelTextPanel(
-                new JLabel("Password"), passwordInputField);
+        final JPanel form = AuthLayout.formColumn();
+        form.add(AuthLayout.tabs(true, () -> { }, () -> loginController.switchToSignupView()));
+        form.add(Box.createVerticalStrut(28));
+        form.add(AuthLayout.heading("Welcome back", "Log in to see your groups and balances."));
+        form.add(Box.createVerticalStrut(24));
+        form.add(AuthLayout.field("Email", new InputField(emailInputField), null));
+        form.add(Box.createVerticalStrut(18));
+        form.add(AuthLayout.field("Password", new InputField(passwordInputField), null));
+        form.add(Box.createVerticalStrut(14));
+        form.add(errorLabel);
+        form.add(Box.createVerticalStrut(14));
+        form.add(logIn);
+        form.add(Box.createVerticalStrut(20));
+        form.add(AuthLayout.note("New here? Switch to Sign up. Got an invite code? Enter it after you log in."));
 
-        final JPanel buttons = new JPanel();
-        logIn = new JButton("log in");
-        buttons.add(logIn);
-        cancel = new JButton("cancel");
-        buttons.add(cancel);
+        AuthLayout.build(this, form);
 
-        logIn.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        if (evt.getSource().equals(logIn)) {
-                            final LoginState currentState = loginViewModel.getState();
-
-                            loginController.execute(
-                                    currentState.getEmail(),
-                                    currentState.getPassword()
-                            );
-                        }
-                    }
-                }
-        );
-
-        cancel.addActionListener(this);
-
-        emailInputField.getDocument().addDocumentListener(new DocumentListener() {
-
-            private void documentListenerHelper() {
-                final LoginState currentState = loginViewModel.getState();
-                currentState.setEmail(emailInputField.getText());
-                loginViewModel.setState(currentState);
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
-        });
-
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-        passwordInputField.getDocument().addDocumentListener(new DocumentListener() {
-
-            private void documentListenerHelper() {
-                final LoginState currentState = loginViewModel.getState();
-                currentState.setPassword(new String(passwordInputField.getPassword()));
-                loginViewModel.setState(currentState);
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                documentListenerHelper();
-            }
-        });
-
-        this.add(title);
-        this.add(emailInfo);
-        this.add(emailErrorField);
-        this.add(passwordInfo);
-        this.add(buttons);
+        emailInputField.getDocument().addDocumentListener(new TextChangeListener(() -> {
+            final LoginState state = loginViewModel.getState();
+            state.setEmail(emailInputField.getText().trim());
+            loginViewModel.setState(state);
+        }));
+        passwordInputField.getDocument().addDocumentListener(new TextChangeListener(() -> {
+            final LoginState state = loginViewModel.getState();
+            state.setPassword(new String(passwordInputField.getPassword()));
+            loginViewModel.setState(state);
+        }));
     }
 
-    /**
-     * React to a button click that results in evt.
-     * @param evt the ActionEvent to react to
-     */
-    public void actionPerformed(ActionEvent evt) {
-        System.out.println("Click " + evt.getActionCommand());
+    private void submit() {
+        final LoginState state = loginViewModel.getState();
+        AuthLayout.showError(errorLabel, null);
+        loginController.execute(state.getEmail(), state.getPassword());
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         final LoginState state = (LoginState) evt.getNewValue();
-        setFields(state);
-        emailErrorField.setText(state.getLoginError());
-    }
-
-    private void setFields(LoginState state) {
-        emailInputField.setText(state.getEmail());
+        if (!emailInputField.getText().trim().equals(state.getEmail())) {
+            emailInputField.setText(state.getEmail());
+        }
+        if (state.getPassword().isEmpty() && passwordInputField.getPassword().length > 0) {
+            passwordInputField.setText("");
+        }
+        AuthLayout.showError(errorLabel, state.getLoginError());
     }
 
     public String getViewName() {

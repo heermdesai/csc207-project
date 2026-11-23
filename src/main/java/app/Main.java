@@ -15,7 +15,9 @@ public class Main {
                 .addLogoutUseCase()
                 .build();
 
+        application.setMinimumSize(new java.awt.Dimension(1100, 720));
         application.pack();
+        application.setLocationRelativeTo(null);
         application.setVisible(true);
     }
 }
