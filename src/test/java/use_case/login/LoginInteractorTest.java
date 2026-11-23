@@ -31,6 +31,11 @@ class LoginInteractorTest {
                 assertEquals(expectedMessage, error);
                 assertNull(repository.getCurrentEmail());
             }
+
+            @Override
+            public void switchToSignupView() {
+                fail("Switching views is unexpected.");
+            }
         };
         new LoginInteractor(repository, presenter).execute(new LoginInputData(email, password));
     }
@@ -48,6 +53,11 @@ class LoginInteractorTest {
             @Override
             public void prepareFailView(String error) {
                 fail("Use case failure is unexpected.");
+            }
+
+            @Override
+            public void switchToSignupView() {
+                fail("Switching views is unexpected.");
             }
         };
         new LoginInteractor(repository, presenter).execute(new LoginInputData(" Paul@Mail.UToronto.ca ", "password123"));
