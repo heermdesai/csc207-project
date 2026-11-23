@@ -2,6 +2,7 @@ package entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class Group {
 
@@ -22,6 +23,7 @@ public class Group {
         this.memberEmails = new ArrayList<>();
         this.memberEmails.add(this.creatorEmail);
     }
+
 
     public String getId() {
         return this.id;
@@ -58,6 +60,6 @@ public class Group {
     }
 
     private static String normalize(String email) {
-        return email.trim().toLowerCase();
+        return email.trim().toLowerCase(Locale.ROOT);
     }
 }
