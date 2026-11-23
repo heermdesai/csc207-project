@@ -11,6 +11,7 @@ import java.util.UUID;
 public class CreateGroupInteractor implements CreateGroupInputBoundary {
     private static final String CODE_CHARACTERS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     private static final int CODE_LENGTH = 6;
+    private static final String DEFAULT_CURRENCY = "CAD";
 
     private final CreateGroupDataAccessInterface groupDataAccess;
     private final CreateGroupOutputBoundary presenter;
@@ -32,18 +33,24 @@ public class CreateGroupInteractor implements CreateGroupInputBoundary {
             return;
         }
 
-        // make a join code with generateJoinCode().
+        // Make a join code; if it's taken, make a new one
         String joinCode = this.generateJoinCode();
-        while (this.groupDataAccess.existsByJoinCode(joinCode)){
+        while (this.groupDataAccess.existsByJoinCode(joinCode)) {
             joinCode = this.generateJoinCode();
+        }
+
+        // Default to CAD if no currency was chosen
+        String currency = inputData.getBaseCurrency();
+        if (currency == null || currency.trim().isEmpty()) {
+            currency = DEFAULT_CURRENCY;
         }
 
         // Create the group (the creator becomes the first member) and save it
         Group group = new Group(UUID.randomUUID().toString(), name.trim(), joinCode,
-                inputData.getBaseCurrency(), inputData.getCreatorEmail());
+                currency.trim(), inputData.getCreatorEmail());
         this.groupDataAccess.save(group);
 
-       // Passing output to the presenter
+        // Pass the result to the presenter
         CreateGroupOutputData outputData = new CreateGroupOutputData(name.trim(), joinCode);
         this.presenter.prepareSuccessView(outputData);
     }

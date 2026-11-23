@@ -134,4 +134,12 @@ class CreateGroupInteractorTest {
 
         assertNotEquals(storage.savedGroups.get(0).getId(), storage.savedGroups.get(1).getId());
     }
+    @Test
+    void missingCurrencyDefaultsToCad() {
+        interactor.execute(new CreateGroupInputData("Roommates", ANAHITA, null));
+        assertEquals("CAD", storage.savedGroups.get(0).getBaseCurrency());
+
+        interactor.execute(new CreateGroupInputData("Roommates", ANAHITA, "   "));
+        assertEquals("CAD", storage.savedGroups.get(1).getBaseCurrency());
+    }
 }
