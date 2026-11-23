@@ -183,7 +183,7 @@ final class AuthLayout {
         return brand;
     }
 
-    private static JPanel logo() {
+    static JPanel logo() {
         final JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         row.setOpaque(false);
         final RoundedPanel mark = new RoundedPanel(new BorderLayout(), 14, Theme.LIME, null);
