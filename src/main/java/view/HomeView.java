@@ -7,8 +7,10 @@ import interface_adapter.logout.LogoutController;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -41,6 +43,7 @@ public class HomeView extends JPanel implements PropertyChangeListener {
     private final JPanel balancesSlot = slot("Who owes whom will show up here.");
     private final JPanel expensesSlot = slot("Expenses added to your groups will show up here.");
     private LogoutController logoutController;
+    private CreateGroupView createGroupView;
 
     public HomeView(LoggedInViewModel loggedInViewModel) {
         this.loggedInViewModel = loggedInViewModel;
@@ -89,7 +92,17 @@ public class HomeView extends JPanel implements PropertyChangeListener {
         header.add(greeting);
         header.add(Box.createVerticalStrut(6));
         header.add(AuthLayout.text("Here's where things stand across your groups.", Font.PLAIN, 14f, Theme.MUTED));
-        main.add(header, BorderLayout.NORTH);
+        final JPanel top = new JPanel(new BorderLayout());
+        top.setOpaque(false);
+        top.add(header, BorderLayout.CENTER);
+        final PrimaryButton newGroup = new PrimaryButton("+ New group");
+        newGroup.setPreferredSize(new Dimension(150, 40));
+        newGroup.addActionListener(evt -> openCreateGroup());
+        final JPanel actions = new JPanel(new BorderLayout());
+        actions.setOpaque(false);
+        actions.add(newGroup, BorderLayout.NORTH);
+        top.add(actions, BorderLayout.EAST);
+        main.add(top, BorderLayout.NORTH);
 
         final JPanel grid = new JPanel(new GridBagLayout());
         grid.setOpaque(false);
@@ -183,6 +196,23 @@ public class HomeView extends JPanel implements PropertyChangeListener {
 
     public String getViewName() {
         return loggedInViewModel.getViewName();
+    }
+
+    private void openCreateGroup() {
+        if (createGroupView == null) {
+            return;
+        }
+        createGroupView.prepare(loggedInViewModel.getState().getEmail());
+        final JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "New group",
+                JDialog.ModalityType.APPLICATION_MODAL);
+        dialog.setContentPane(createGroupView);
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+    }
+
+    public void setCreateGroupView(CreateGroupView createGroupView) {
+        this.createGroupView = createGroupView;
     }
 
     public void setLogoutController(LogoutController logoutController) {

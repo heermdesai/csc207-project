@@ -14,6 +14,7 @@ class PrimaryButton extends JButton {
 
     private static final int HEIGHT = 44;
     private static final Color HOVER = new Color(48, 48, 48);
+    private static final Color DISABLED = new Color(170, 169, 162);
 
     PrimaryButton(String text) {
         super(text);
@@ -33,7 +34,12 @@ class PrimaryButton extends JButton {
         final Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g2.setColor(getModel().isRollover() || getModel().isPressed() ? HOVER : Theme.INK);
+        if (!isEnabled()) {
+            g2.setColor(DISABLED);
+        }
+        else {
+            g2.setColor(getModel().isRollover() || getModel().isPressed() ? HOVER : Theme.INK);
+        }
         g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
         g2.setColor(getForeground());
         g2.setFont(getFont());

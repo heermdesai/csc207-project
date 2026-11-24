@@ -9,9 +9,11 @@ public class Main {
                 .addLoginView()
                 .addSignupView()
                 .addHomeView()
+                .addCreateGroupView()
                 .addSignupUseCase()
                 .addLoginUseCase()
                 .addLogoutUseCase()
+                .addCreateGroupUseCase()
                 .build();
 
         application.setMinimumSize(new java.awt.Dimension(1100, 720));
