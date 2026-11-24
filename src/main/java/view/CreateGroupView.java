@@ -11,6 +11,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import java.awt.Window;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -33,6 +35,7 @@ public class CreateGroupView extends JPanel implements PropertyChangeListener {
     private final JPanel successBox;
     private final JLabel joinCodeLabel = AuthLayout.text(" ", Font.BOLD, 26f, Theme.INK);
     private final JLabel successTitle = AuthLayout.text(" ", Font.BOLD, 14f, Theme.INK);
+    private final PrimaryButton createButton = new PrimaryButton("Create group");
     private CreateGroupController createGroupController;
     private String creatorEmail = "";
 
@@ -48,8 +51,7 @@ public class CreateGroupView extends JPanel implements PropertyChangeListener {
         currencyBox.setAlignmentX(LEFT_ALIGNMENT);
         currencyBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, FIELD_HEIGHT));
 
-        final PrimaryButton create = new PrimaryButton("Create group");
-        create.addActionListener(evt -> submit());
+        createButton.addActionListener(evt -> submit());
         nameField.addActionListener(evt -> submit());
 
         successBox = success();
@@ -65,7 +67,7 @@ public class CreateGroupView extends JPanel implements PropertyChangeListener {
         form.add(Box.createVerticalStrut(14));
         form.add(errorLabel);
         form.add(Box.createVerticalStrut(14));
-        form.add(create);
+        form.add(createButton);
         form.add(Box.createVerticalStrut(18));
         form.add(successBox);
         add(form, BorderLayout.NORTH);
@@ -88,14 +90,25 @@ public class CreateGroupView extends JPanel implements PropertyChangeListener {
         box.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 16));
         box.add(successTitle, BorderLayout.NORTH);
         box.add(joinCodeLabel, BorderLayout.CENTER);
-        box.add(AuthLayout.text("Share this code so friends can join.", Font.PLAIN, 12f, Theme.MUTED),
-                BorderLayout.SOUTH);
+        final SecondaryButton done = new SecondaryButton("Done", Theme.INK, Theme.INK, Theme.LIME);
+        done.addActionListener(evt -> close());
+        final JPanel footer = new JPanel(new BorderLayout(12, 0));
+        footer.setOpaque(false);
+        footer.add(AuthLayout.text("Share this code so friends can join.", Font.PLAIN, 12f, Theme.MUTED),
+                BorderLayout.CENTER);
+        done.setPreferredSize(new Dimension(90, 34));
+        footer.add(done, BorderLayout.EAST);
+        box.add(footer, BorderLayout.SOUTH);
         box.setAlignmentX(LEFT_ALIGNMENT);
         box.setMaximumSize(new Dimension(Integer.MAX_VALUE, 110));
         return box;
     }
 
     private void submit() {
+        if (!createButton.isEnabled()) {
+            return;
+        }
+        setFormEnabled(false);
         AuthLayout.showError(errorLabel, null);
         createGroupController.execute(nameField.getText(), creatorEmail, (String) currencyBox.getSelectedItem());
     }
@@ -106,6 +119,20 @@ public class CreateGroupView extends JPanel implements PropertyChangeListener {
         currencyBox.setSelectedIndex(0);
         AuthLayout.showError(errorLabel, null);
         successBox.setVisible(false);
+        setFormEnabled(true);
+    }
+
+    private void setFormEnabled(boolean enabled) {
+        createButton.setEnabled(enabled);
+        nameField.setEnabled(enabled);
+        currencyBox.setEnabled(enabled);
+    }
+
+    private void close() {
+        final Window window = SwingUtilities.getWindowAncestor(this);
+        if (window != null) {
+            window.dispose();
+        }
     }
 
     @Override
@@ -118,6 +145,7 @@ public class CreateGroupView extends JPanel implements PropertyChangeListener {
             joinCodeLabel.setText(state.getJoinCode());
         }
         successBox.setVisible(created);
+        setFormEnabled(!created);
         revalidate();
         repaint();
     }
