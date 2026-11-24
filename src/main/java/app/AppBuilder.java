@@ -1,8 +1,12 @@
 package app;
 
 import data_access.FileUserDataAccessObject;
+import data_access.FileGroupDataAccessObject;
 import entity.UserFactory;
 import interface_adapter.ViewManagerModel;
+import interface_adapter.create_group.CreateGroupController;
+import interface_adapter.create_group.CreateGroupPresenter;
+import interface_adapter.create_group.CreateGroupViewModel;
 import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
@@ -12,6 +16,9 @@ import interface_adapter.logout.LogoutPresenter;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import use_case.create_group.CreateGroupInputBoundary;
+import use_case.create_group.CreateGroupInteractor;
+import use_case.create_group.CreateGroupOutputBoundary;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
@@ -21,6 +28,7 @@ import use_case.logout.LogoutOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
+import view.CreateGroupView;
 import view.HomeView;
 import view.LoginView;
 import view.SignupView;
@@ -55,6 +63,9 @@ public class AppBuilder {
     private LoginViewModel loginViewModel;
     private LoggedInViewModel loggedInViewModel;
     private HomeView homeView;
+    private CreateGroupViewModel createGroupViewModel;
+    private CreateGroupView createGroupView;
+    private final FileGroupDataAccessObject groupDataAccessObject = new FileGroupDataAccessObject("groups.json");
     private LoginView loginView;
 
     public AppBuilder() {
@@ -113,6 +124,21 @@ public class AppBuilder {
 
         final LogoutController logoutController = new LogoutController(logoutInteractor);
         homeView.setLogoutController(logoutController);
+        return this;
+    }
+
+    public AppBuilder addCreateGroupView() {
+        createGroupViewModel = new CreateGroupViewModel();
+        createGroupView = new CreateGroupView(createGroupViewModel);
+        homeView.setCreateGroupView(createGroupView);
+        return this;
+    }
+
+    public AppBuilder addCreateGroupUseCase() {
+        final CreateGroupOutputBoundary createGroupPresenter = new CreateGroupPresenter(createGroupViewModel);
+        final CreateGroupInputBoundary createGroupInteractor =
+                new CreateGroupInteractor(groupDataAccessObject, createGroupPresenter);
+        createGroupView.setCreateGroupController(new CreateGroupController(createGroupInteractor));
         return this;
     }
 
