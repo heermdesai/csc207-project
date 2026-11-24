@@ -43,7 +43,9 @@ public class AddExpenseDemo {
         JFrame frame = new JFrame("Splitter: Add Expense");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(view);
-        frame.setSize(720, 480);
+        frame.setMinimumSize(new java.awt.Dimension(1000, 680));
+        frame.setSize(1100, 700);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 }
